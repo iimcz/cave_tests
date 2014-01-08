@@ -49,7 +49,7 @@ struct dispatch_data_t {
 };
 
 /*!
- * A workaround for the need to use C-style function pointer in CAVElib.
+ * A workaround for the need to use C-style function pointers in CAVElib.
  * Not usable in GLUT as there isn't any way to pass data to the callback.
  *
  * @param data Pointer to dispatch_data_t containing function to execute.
