@@ -112,10 +112,10 @@ void Application::init_cave()
 {
 	if (CAVEMasterDisplay()) {
 		glewInit();
-		std::random_device rd;
 		unsigned int seed;
 		CAVEDistribOpenConnection(comm_channel);
 		if (CAVEDistribMaster()) {
+			std::random_device rd;
 			seed = rd();
 			buttons_.resize(CAVEController->num_buttons);
 			CAVEDistribWrite(comm_channel, &seed, sizeof(seed));
