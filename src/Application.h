@@ -28,12 +28,12 @@ struct app_state {
 class Application {
 public:
 	Application(int argc, char** argv);
-	~Application() noexcept = default;
+	virtual ~Application() noexcept = default;
 	int run();
 private:
 	void init_gl();
 	void update();
-	void render();
+	void render() const;
 	void update_time(double current_time);
 	void reset(bool value);
 
@@ -41,17 +41,16 @@ private:
 	void update_cave();
 	void init_cave();
 #else
-//public:
 	static Application* instance; // This is UGLY and only for GLUT
 	static void render_glut();
 	static void keyboard_glut(unsigned char key, int x, int y);
-
-
-
 #endif
 
 
-	struct button {
+	/*!
+	 * Simple helper to catch changes of button value
+	 */
+	struct button_t {
 		bool state = false;
 		bool was_pressed = false;
 		void update(bool new_state) {
@@ -66,7 +65,7 @@ private:
 	std::uniform_real_distribution<float> distribution_direction_;
 	double last_time_;
 	app_state state_;
-	std::vector<button> buttons;
+	std::vector<button_t> buttons_;
 };
 
 }

@@ -11,10 +11,11 @@
 namespace CAVE {
 
 namespace {
-const point3 gravity {0.0f, -0.5f, 0.0f};
-const color4 cold {0.0f, 0.3f, 1.0f, 1.0f};
+const point3 gravity {0.0f, -1.0f, 0.0f};
+const color4 cold {0.0f, 0.73f, 1.0f, 1.0f};
 const color4 hot {0.8f, 0.0f, 0.0f, 1.0f};
 const float default_life = 10.0f;
+const float slowdown_per_second = 0.2f;
 }
 
 Particle::Particle(const point3& position, const point3& direction):
@@ -31,7 +32,7 @@ void Particle::draw() const
 void Particle::update(float time_delta)
 {
 	position_ = position_ + (time_delta*direction_);
-	direction_ = direction_ + time_delta * gravity;
+	direction_ = (1.0f - time_delta * slowdown_per_second) * direction_ + time_delta * gravity;
 	life_ -= time_delta;
 }
 

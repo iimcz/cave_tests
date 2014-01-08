@@ -11,6 +11,7 @@
 #ifndef GEOMETRY_H_
 #define GEOMETRY_H_
 #include <algorithm>
+#include <type_traits>
 namespace CAVE {
 struct point3 {
 	float x;
@@ -24,16 +25,21 @@ struct color4 {
 	float a;
 };
 
+
 template<typename T>
-point3 operator*(const T& scalar, const point3& point)
+typename std::enable_if<std::is_arithmetic<T>::value, point3>::type
+operator*(const T& scalar, const point3& point)
 {
 	return {point.x * scalar, point.y * scalar, point.z * scalar};
 }
+
 template<typename T>
-point3 operator*(const point3& point, const T& scalar)
+typename std::enable_if<std::is_arithmetic<T>::value, point3>::type
+operator*(const point3& point, const T& scalar)
 {
 	return {point.x * scalar, point.y * scalar, point.z * scalar};
 }
+
 inline point3 operator+(const point3& point1, const point3& point2)
 {
 	return {point1.x + point2.x, point1.y + point2.y, point1.z + point2.z};
