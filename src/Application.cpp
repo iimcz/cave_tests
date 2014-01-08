@@ -40,6 +40,7 @@ const float rotation_per_second = pi_constant/2.0f;
 //! Default position in the scene (for reset())
 const point3 default_position = {0.0f, 0.0f, -5.0f};
 
+#ifdef CAVE_VERSION
 //! Communication channel for CAVElib
 const int comm_channel = 37;
 
@@ -60,7 +61,7 @@ void dispatcher(void* data) {
 		dispatch_data->fun();
 	}
 }
-
+#endif
 /*!
  * Creates new particle using provided generator and distribution objects.
  * @param d_position  Distribution object for generating particle position
@@ -113,6 +114,7 @@ void Application::init_cave()
 	if (CAVEMasterDisplay()) {
 		glewInit();
 		unsigned int seed;
+		// Open communication channel
 		CAVEDistribOpenConnection(comm_channel);
 		if (CAVEDistribMaster()) {
 			std::random_device rd;
@@ -122,7 +124,7 @@ void Application::init_cave()
 		} else {
 			CAVEDistribRead(comm_channel, &seed, sizeof(seed));
 		}
-		genenerator_.seed(seed);
+		generator_.seed(seed);
 
 	}
 	CAVEDisplayBarrier();
@@ -230,7 +232,7 @@ void Application::update()
 	}
 
 	for (size_t i = 0; i < state_.particles_to_create; ++i) {
-		particles_.emplace_back(create_particle(distribution_position_, distribution_direction_, genenerator_));
+		particles_.emplace_back(create_particle(distribution_position_, distribution_direction_, generator_));
 	}
 	for (auto& p: particles_) {
 		p.update(state_.time_delta);
@@ -317,6 +319,8 @@ int Application::run()
 
 
 	init_gl();
+	std::random_device rd;
+	generator_.seed(rd());
 	glutDisplayFunc(render_glut);
 	glutReshapeFunc(resize_glut);
 	glutIdleFunc(render_glut);

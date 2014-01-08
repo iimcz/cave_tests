@@ -60,7 +60,7 @@ private:
 	};
 
 	std::vector<Particle> particles_;
-	std::mt19937 genenerator_;
+	std::mt19937 generator_;
 	std::uniform_real_distribution<float> distribution_position_;
 	std::uniform_real_distribution<float> distribution_direction_;
 	double last_time_;
