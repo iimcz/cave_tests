@@ -8,6 +8,7 @@
  */
 #include "Scene.h"
 #include "platform.h"
+#include <stdexcept>
 namespace CAVE {
 
 
