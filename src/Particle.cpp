@@ -19,21 +19,24 @@ const float slowdown_per_second = 0.2f;
 }
 
 Particle::Particle(const point3& position, const point3& direction):
-life_(default_life),position_(position), direction_(direction)
+life(default_life),position(position), direction(direction)
 {
 
 }
-
-void Particle::draw() const
-{
-	if (life_ > 0.0f)
-		triangle_.draw(position_,color_grad(cold, hot, direction_.y/2+1.0f));
+color4 Particle::get_color() const {
+	return color_grad(cold, hot, direction.y/2+1.0f);
 }
+
+//void Particle::draw() const
+//{
+//	if (life_ > 0.0f)
+//		triangle_.draw(position_,color_grad(cold, hot, direction_.y/2+1.0f));
+//}
 void Particle::update(float time_delta)
 {
-	position_ = position_ + (time_delta*direction_);
-	direction_ = (1.0f - time_delta * slowdown_per_second) * direction_ + time_delta * gravity;
-	life_ -= time_delta;
+	position = position + (time_delta*direction);
+	direction = (1.0f - time_delta * slowdown_per_second) * direction + time_delta * gravity;
+	life -= time_delta;
 }
 
 }

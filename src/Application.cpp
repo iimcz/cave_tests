@@ -13,12 +13,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-#ifdef CAVE_VERSION
-#include <cave_ogl.h>
-#else
-#include <GL/glut.h>
-#endif
-
+#include "platform.h"
 
 
 namespace CAVE {
@@ -33,8 +28,6 @@ namespace {
 
 //! Number of particles to spwan each second
 const size_t particles_per_second = 400;
-//! PI constant
-const float pi_constant = 3.14159265f;
 //! Rotation speed (in rad/s)
 const float rotation_per_second = pi_constant/2.0f;
 //! Default position in the scene (for reset())
@@ -62,33 +55,10 @@ void dispatcher(void* data) {
 	}
 }
 #endif
-/*!
- * Creates new particle using provided generator and distribution objects.
- * @param d_position  Distribution object for generating particle position
- * @param d_direction Distribution object for generating particle direction
- * @param generator   Generator providing random numbers
- * @return
- */
-template<class Generator>
-Particle create_particle(std::uniform_real_distribution<float>& d_position,
-		std::uniform_real_distribution<float>& d_direction,
-		Generator& generator)
-{
-	point3 position;
-	position.x = d_position(generator);
-	position.y = d_position(generator);
-	position.z = d_position(generator);
-	point3 direction;
-	direction.x = d_direction(generator);
-	direction.y = d_direction(generator)*2.0f+2.0;
-	direction.z = d_direction(generator);
-	return {position, direction};
 }
-}
-
 
 Application::Application(int argc, char** argv):
-distribution_position_(0.0, 1.0), distribution_direction_(-1.0, 1.0),last_time_(0.0)
+last_time_(0.0),scene_(particles_per_second)
 {
 #ifdef CAVE_VERSION
 	CAVEConfigure(&argc,argv,nullptr);
@@ -106,6 +76,7 @@ void Application::init_gl()
 	glEnable(GL_DEPTH_TEST);
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	scene_.prepare_details();
 }
 
 #ifdef CAVE_VERSION
@@ -124,7 +95,7 @@ void Application::init_cave()
 		} else {
 			CAVEDistribRead(comm_channel, &seed, sizeof(seed));
 		}
-		generator_.seed(seed);
+		scene_.set_seed(seed);
 
 	}
 	CAVEDisplayBarrier();
@@ -228,25 +199,16 @@ void Application::keyboard_glut(unsigned char key, int /*x*/, int /*y*/)
 void Application::update()
 {
 	if (state_.reset_scene) {
-		particles_.clear();
+		scene_.reset();
 	}
-
-	for (size_t i = 0; i < state_.particles_to_create; ++i) {
-		particles_.emplace_back(create_particle(distribution_position_, distribution_direction_, generator_));
-	}
-	for (auto& p: particles_) {
-		p.update(state_.time_delta);
-	}
-	particles_.erase(std::remove_if(particles_.begin(), particles_.end(),
-			[](Particle& p){return p.dead();}), particles_.end());
-	reset(false);
+	scene_.update(state_.time_delta);
 }
 
 void Application::update_time(double current_time)
 {
 	state_.time_delta = current_time - last_time_;
 	last_time_ = current_time;
-	state_.particles_to_create = static_cast<size_t>(particles_per_second * state_.time_delta);
+	//state_.particles_to_create = static_cast<size_t>(particles_per_second * state_.time_delta);
 }
 void Application::reset(bool value)
 {
@@ -258,34 +220,7 @@ void Application::reset(bool value)
 }
 void Application::render() const
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/*
-	 * For the sake of simplicity, the old OpenGL matrix stack is used here.
-	 *
-	 * In OpenGL 3.0, where the matrices are handled in shaders,
-	 * will things get a little bit more complicated.
-	 *
-	 * As CAVElib is not aware of OpenGL 3.0+, it always uses the matrix stack.
-	 * So in order to get the matrices, we have to read them from the stack.
-	 * For example:
-	 *
-	 * std::array<float, 16> modelview_matrix;
-	 * glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix.data());
-	 * std::array<float, 16> projection_matrix;
-	 * glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix.data());
-	 *
-	 */
-
-	glRotatef(-state_.rotation_y  * 180.0f / pi_constant, 0.0f, 1.0f, 0.0f);
-	glTranslatef(state_.position.x, state_.position.y, state_.position.z);
-
-	// The important part here is that particles are handled only through const references.
-	// And the vector is never modified.
-	for (const auto& p: particles_) {
-		p.draw();
-	}
-
+	scene_.render(state_.position, state_.rotation_y);
 }
 
 int Application::run()
@@ -317,10 +252,10 @@ int Application::run()
 	resize_glut(800,600);
 	glutCreateWindow("CAVElib example");
 
-
+	glewInit();
 	init_gl();
 	std::random_device rd;
-	generator_.seed(rd());
+	scene_.set_seed(rd());
 	glutDisplayFunc(render_glut);
 	glutReshapeFunc(resize_glut);
 	glutIdleFunc(render_glut);

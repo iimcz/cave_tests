@@ -13,6 +13,10 @@
 #include <algorithm>
 #include <type_traits>
 namespace CAVE {
+
+//! PI constant
+const float pi_constant = 3.14159265f;
+
 struct point3 {
 	float x;
 	float y;
@@ -24,7 +28,6 @@ struct color4 {
 	float b;
 	float a;
 };
-
 
 template<typename T>
 typename std::enable_if<std::is_arithmetic<T>::value, point3>::type
@@ -56,6 +59,7 @@ inline color4 color_grad(const color4& start, const color4 end, float val)
 		start.a * val1 + end.a * val
 	};
 }
+
 
 }
 

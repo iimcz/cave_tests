@@ -11,9 +11,9 @@
 #ifndef APPLICATION_H_
 #define APPLICATION_H_
 
-#include "Particle.h"
-#include <vector>
-#include <random>
+#include "Scene.h"
+
+
 
 namespace CAVE {
 
@@ -22,7 +22,7 @@ struct app_state {
 	bool reset_scene 	= false;
 	point3 position 	= {0.0f, 0.0f, -5.0f};
 	float rotation_y	= 0.0f;
-	size_t particles_to_create = 0;
+//	size_t particles_to_create = 0;
 };
 
 class Application {
@@ -59,13 +59,10 @@ private:
 		}
 	};
 
-	std::vector<Particle> particles_;
-	std::mt19937 generator_;
-	std::uniform_real_distribution<float> distribution_position_;
-	std::uniform_real_distribution<float> distribution_direction_;
 	double last_time_;
 	app_state state_;
 	std::vector<button_t> buttons_;
+	Scene scene_;
 };
 
 }

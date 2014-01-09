@@ -10,21 +10,22 @@
 
 #ifndef PARTICLE_H_
 #define PARTICLE_H_
-#include "Triangle.h"
+//#include "Triangle.h"
+#include "geometry.h"
 
 namespace CAVE {
-class Particle {
+struct Particle {
 public:
 	Particle(const point3& position, const point3& direction);
 	~Particle() noexcept = default;
-	void draw() const;
-	bool dead() const { return life_ < 0;}
+	bool dead() const { return life < 0;}
 	void update(float time_delta);
-private:
-	float life_;
-	point3 position_;
-	point3 direction_;
-	Triangle triangle_;
+	color4 get_color() const;
+
+	float life;
+	point3 position;
+	point3 direction;
+
 };
 
 

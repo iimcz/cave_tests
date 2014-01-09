@@ -18,7 +18,8 @@ include_directories ( ${CAVELIB_DIR}/include )
 add_executable(triangles triangles.cpp
                         Application.h Application.cpp
                         Particle.h Particle.cpp
-                        Triangle.h Triangle.cpp
+                        Scene.h Scene.cpp
+                        Shader.h Shader.cpp
                         )
 
 
