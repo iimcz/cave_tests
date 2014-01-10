@@ -37,13 +37,29 @@ ShaderProgram::Shader::Shader(const std::string& text, GLenum type):shader(0)
 	}
 }
 
-ShaderProgram::ShaderProgram(const std::string& vertex_shader_text, const std::string& fragment_shader_text)
+ShaderProgram::ShaderProgram(const std::string& vertex_shader_text,
+							const std::string& fragment_shader_text,
+							const std::string& geometry_shader_text)
 {
 	Shader vertex_shader(vertex_shader_text, GL_VERTEX_SHADER);
 	Shader fragment_shader(fragment_shader_text, GL_FRAGMENT_SHADER);
+	Shader geometry_shader(geometry_shader_text, GL_GEOMETRY_SHADER);
 	program_ = glCreateProgram();
 	if (vertex_shader.shader) glAttachShader(program_, vertex_shader.shader);
 	if (fragment_shader.shader) glAttachShader(program_, fragment_shader.shader);
+	if (geometry_shader.shader) glAttachShader(program_, geometry_shader.shader);
+}
+
+void ShaderProgram::bind() const
+{
+	glUseProgram(program_);
+}
+void ShaderProgram::unbind() const
+{
+	glUseProgram(0);
+}
+bool ShaderProgram::link()
+{
 	glLinkProgram(program_);
 	GLint linked;
 	glGetProgramiv(program_, GL_LINK_STATUS, &linked);
@@ -57,17 +73,18 @@ ShaderProgram::ShaderProgram(const std::string& vertex_shader_text, const std::s
 			glGetInfoLogARB(program_, blen, &slen, &compiler_log[0]);
 			std::cerr << "compiler_log:" <<  compiler_log << "\n";
 		}
-		throw std::runtime_error("Failed to link shader program");
+		return false;
 	}
+	return true;
 }
 
-void ShaderProgram::bind() const
+void ShaderProgram::bind_attrib(GLuint index, const std::string& name)
 {
-	glUseProgram(program_);
+	glBindAttribLocation(program_,index,name.c_str());
 }
-void ShaderProgram::unbind() const
+void ShaderProgram::bind_frag_data(GLuint index, const std::string& name)
 {
-	glUseProgram(0);
+	glBindFragDataLocation(program_, index, name.c_str());
 }
 
 namespace {

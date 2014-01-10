@@ -23,7 +23,10 @@ class ShaderProgram {
 		GLuint shader;
 	};
 public:
-	ShaderProgram(const std::string& vertex_shader_text, const std::string& fragment_shader_text);
+	ShaderProgram(const std::string& vertex_shader_text, const std::string& fragment_shader_text, const std::string& geometry_shader_text = std::string());
+	bool link();
+	void bind_attrib(GLuint index, const std::string& name);
+	void bind_frag_data(GLuint index, const std::string& name);
 	void bind() const;
 	void unbind() const;
 

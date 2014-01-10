@@ -22,9 +22,10 @@ public:
 	void update(float time_delta);
 	color4 get_color() const;
 
-	float life;
+
 	point3 position;
 	point3 direction;
+	float life;
 
 };
 

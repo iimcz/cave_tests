@@ -34,10 +34,13 @@ namespace CAVE {
 		std::uniform_real_distribution<float> distribution_direction_;
 
 		struct gl_details_t{
-			gl_details_t(const std::string& fs, const std::string& vs):
-			shader(vs,fs) {	}
+			gl_details_t(const std::string& fs, const std::string& vs, const std::string& gs=std::string()):
+			shader(vs,fs,gs),vba(0),fbo(0) {	}
 
 			ShaderProgram shader;
+			GLuint vba;
+			GLuint fbo;
+
 		};
 		std::map<int, gl_details_t> details_;
 	};

@@ -19,7 +19,7 @@ const float slowdown_per_second = 0.2f;
 }
 
 Particle::Particle(const point3& position, const point3& direction):
-life(default_life),position(position), direction(direction)
+position(position), direction(direction),life(default_life)
 {
 
 }
