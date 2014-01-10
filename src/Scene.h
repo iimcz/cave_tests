@@ -15,6 +15,7 @@
 #include <random>
 #include <vector>
 #include <map>
+#include <mutex>
 
 namespace CAVE {
 	class Scene {
@@ -43,6 +44,11 @@ namespace CAVE {
 
 		};
 		std::map<int, gl_details_t> details_;
+		mutable std::mutex detail_mutex_;
+
+
+		gl_details_t& new_detail();
+		const gl_details_t& get_detail() const;
 	};
 
 

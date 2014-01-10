@@ -84,7 +84,7 @@ const std::string geometry_shader = R"XXX(
 		
 		in vdata0 {
 			vec4 color;
-		} vertex[1];
+		} vertex[];
 
 		out vdata {
 			vec2 texcoords;
@@ -173,6 +173,7 @@ void Scene::update(float time_delta)
 	particles_.erase(std::remove_if(particles_.begin(), particles_.end(),
 			[](Particle& p){return p.dead();}), particles_.end());
 }
+
 void Scene::render(const point3& position, const float rotation_y) const
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -198,7 +199,7 @@ void Scene::render(const point3& position, const float rotation_y) const
 	glTranslatef(position.x, position.y, position.z);
 
 
-	const gl_details_t& detail = details_.at(get_thread_id());
+	const gl_details_t& detail = get_detail();
 	detail.shader.bind();
 
 	// The important part here is that particles are handled only through const references.
@@ -234,14 +235,7 @@ void Scene::prepare_details()
 	const std::string name_direction = "direction";
 
 
-	const int thread_id = get_thread_id();
-	if (details_.find(thread_id) != details_.end()) {
-		throw std::runtime_error("Attemt to initialize already initialized detail!");
-	}
-
-	auto res = details_.insert(std::make_pair(thread_id, gl_details_t(fragment_shader, vertex_shader, geometry_shader)));
-	assert(res.second);
-	auto& detail = res.first->second;
+	gl_details_t& detail = new_detail();
 
 
 	detail.shader.bind_attrib(index_vertices, name_vertices);
@@ -280,6 +274,24 @@ void Scene::prepare_details()
 	glBindVertexArray(0);
 }
 
+Scene::gl_details_t& Scene::new_detail()
+{
+	std::unique_lock<std::mutex> _(detail_mutex_);
+	const int thread_id = get_thread_id();
+	if (details_.find(thread_id) != details_.end()) {
+		throw std::runtime_error("Attemt to initialize already initialized detail!");
+	}
+
+	auto res = details_.insert(std::make_pair(thread_id, gl_details_t(fragment_shader, vertex_shader, geometry_shader)));
+	assert(res.second);
+	return res.first->second;
+}
+
+const Scene::gl_details_t& Scene::get_detail() const
+{
+	std::unique_lock<std::mutex> _(detail_mutex_);
+	return details_.at(get_thread_id());
+}
 
 }
 
