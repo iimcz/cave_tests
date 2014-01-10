@@ -10,6 +10,8 @@
 #include "platform.h"
 #include <stdexcept>
 #include <iostream>
+#include <GL/glu.h>
+
 namespace CAVE {
 
 
