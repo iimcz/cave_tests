@@ -10,7 +10,6 @@
 
 #ifndef PARTICLE_H_
 #define PARTICLE_H_
-//#include "Triangle.h"
 #include "geometry.h"
 
 namespace CAVE {
@@ -20,8 +19,6 @@ public:
 	~Particle() noexcept = default;
 	bool dead() const { return life < 0;}
 	void update(float time_delta);
-	color4 get_color() const;
-
 
 	point3 position;
 	point3 direction;
