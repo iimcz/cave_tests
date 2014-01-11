@@ -200,6 +200,7 @@ void Application::update()
 {
 	if (state_.reset_scene) {
 		scene_.reset();
+		reset(false);
 	}
 	scene_.update(state_.time_delta);
 }
