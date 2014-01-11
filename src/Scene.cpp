@@ -49,7 +49,7 @@ const std::string fragment_shader = R"XXX(
 			//color = vec4(1.0,0.0,0.0,1.0);
 			//return;
 			float dist = distance(vtx.texcoords.xy,vec2(0.5,0.5));
-			if (dist > 0.5) {
+			if (dist > 0.5) { 
 				discard;
 			} else {
 				float val = (1.0 - 2 * dist);
@@ -60,7 +60,7 @@ const std::string fragment_shader = R"XXX(
 const std::string vertex_shader = R"XXX(
 		#version 120
 		#extension GL_ARB_gpu_shader5 : enable
-		vec4 cold = vec4(0.0f, 0.73f, 1.0f, 1.0f);
+		vec4 cold = vec4(0.0f, 0.73f, .40f, 1.0f);
 		vec4 hot = vec4(0.8f, 0.0f, 0.0f, 1.0f);
 		in vec3 position;
 		in vec3 direction;
@@ -122,29 +122,6 @@ bool check_gl_error(const std::string& file, size_t line) {
 }
 #define GL_CHECK_ERROR check_gl_error(__FILE__, __LINE__);
 
-//void draw_quad(const point3& position, const color4& color)
-//{
-//	glPushMatrix();
-//	glEnable(GL_BLEND);
-//	glDisable(GL_DEPTH_TEST);
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//	glTranslatef(position.x, position.y, position.z);
-//	glBegin(GL_QUADS);
-//		glColor4fv(&color.r);
-//		glTexCoord2f(0.0f,  0.0f);
-//		glVertex3f(-0.1f,  -0.1f,  0.0f);
-//		glTexCoord2f(1.0f,  0.0f);
-//		glColor4fv(&color.r);
-//		glVertex3f( 0.1f, -0.1f,  0.0f);
-//		glTexCoord2f(1.0f,  1.0f);
-//		glColor4fv(&color.r);
-//		glVertex3f( 0.1f,  0.1f,  0.0f);
-//		glTexCoord2f(0.0f,  1.0f);
-//		glColor4fv(&color.r);
-//		glVertex3f(-0.1f,  0.1f,  0.0f);
-//	glEnd();
-//	glPopMatrix();
-//}
 }
 
 
